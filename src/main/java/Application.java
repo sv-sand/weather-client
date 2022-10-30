@@ -100,7 +100,7 @@ public class Application {
 
     private static void setCity(WeatherClient client, String cityName) {
         try {
-            client.setCityAndCheck(cityName);
+            client.setCity(cityName);
         } catch (WeatherException e) {
             System.out.println(e.getLocalizedMessage());
         }

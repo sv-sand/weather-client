@@ -62,7 +62,7 @@ public class WeatherClientTest {
         }
 
         try {
-            client.setCityAndCheck("Moskow");
+            client.setCity("Moskow");
         } catch (WeatherException e) {
             return;
         }
@@ -78,7 +78,7 @@ public class WeatherClientTest {
         }
 
         try {
-            client.setCityAndCheck("Moskow");
+            client.setCity("Moskow");
         } catch (WeatherException e) {
             return;
         }
@@ -94,7 +94,7 @@ public class WeatherClientTest {
         }
 
         try {
-            client.setCityAndCheck("Moscow");
+            client.setCity("Moscow");
         } catch (WeatherException e) {
             Assert.fail(e.getLocalizedMessage());
         }
@@ -115,7 +115,7 @@ public class WeatherClientTest {
         }
 
         try {
-            client.setCityAndCheck("Москва");
+            client.setCity("Москва");
         } catch (WeatherException e) {
             Assert.fail(e.getLocalizedMessage());
         }

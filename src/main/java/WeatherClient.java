@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -29,7 +30,8 @@ public class WeatherClient {
     private ResourceBundle res;
 
     private WeatherToday weatherToday;
-    private String cityName;
+
+    // Methods
 
     public WeatherClient(String apiId) {
         this.apiId = apiId;
@@ -43,7 +45,7 @@ public class WeatherClient {
     }
 
     public WeatherToday loadWeatherToday() throws WeatherException {
-        String url = URL + "/weather?q="+cityName+"&appid="+ apiId +"&lang="+locale.getLanguage();
+        String url = URL + "/weather?q=" + weatherToday.getCity() + "&appid=" + apiId + "&lang=" + locale.getLanguage();
         String JsonString = connectHttpService(url);
 
         JSONObject jsonObject = getJsonObject(JsonString);
@@ -54,9 +56,13 @@ public class WeatherClient {
                     jsonObject.get("message").toString()
             );
 
-        weatherToday.loadJson(jsonObject);
+        fillWeatherTodayFromJson(jsonObject);
 
         return weatherToday;
+    }
+
+    private double kelvinToCelsius(double kelvin) {
+        return kelvin - 273.15;
     }
 
     // HTTP client
@@ -94,6 +100,8 @@ public class WeatherClient {
         return result;
     }
 
+    // JSON
+
     private JSONObject getJsonObject(String JsonString) throws WeatherException {
         JSONObject object;
 
@@ -107,6 +115,45 @@ public class WeatherClient {
             throw getExceptionJsonParsing(e.getLocalizedMessage());
         }
         return object;
+    }
+
+    private void fillWeatherTodayFromJson(JSONObject jsonRoot) {
+        weatherToday.setTimeZone((long) jsonRoot.get("timezone") / 3600);
+        weatherToday.setVisibility((long) jsonRoot.get("visibility"));
+        weatherToday.setCity((String) jsonRoot.get("name"));
+        weatherToday.setDate(new Date( ((Long) jsonRoot.get("dt")) * 1000 ));
+
+        var jsonMain = (JSONObject) jsonRoot.get("main");
+        weatherToday.setTemp(
+                kelvinToCelsius((double) jsonMain.get("temp"))
+        );
+        weatherToday.setTempMin(
+                kelvinToCelsius((double) jsonMain.get("temp_min"))
+        );
+        weatherToday.setTempMax(
+                kelvinToCelsius((double) jsonMain.get("temp_max"))
+        );
+        weatherToday.setTempFeels(
+                kelvinToCelsius((double) jsonMain.get("feels_like"))
+        );
+        weatherToday.setGroundLevel((long) jsonMain.get("grnd_level"));
+        weatherToday.setHumidity((long) jsonMain.get("humidity"));
+        weatherToday.setPressure((long) jsonMain.get("pressure"));
+        weatherToday.setSeaLevel((long) jsonMain.get("sea_level"));
+
+        var jsonSys = (JSONObject) jsonRoot.get("sys");
+        weatherToday.setCountry((String) jsonSys.get("country"));
+        weatherToday.setSunrise((long) jsonSys.get("sunrise"));
+        weatherToday.setSunset((long) jsonSys.get("sunset"));
+
+        var jsonCoord = (JSONObject) jsonRoot.get("coord");
+        weatherToday.setLongitude((double) jsonCoord.get("lon"));
+        weatherToday.setLatitude((double) jsonCoord.get("lat"));
+
+        var jsonWind = (JSONObject) jsonRoot.get("wind");
+        weatherToday.setWindDeg((long) jsonWind.get("deg"));
+        weatherToday.setWindSpeed((double) jsonWind.get("speed"));
+        weatherToday.setWindGust((double) jsonWind.get("gust"));
     }
 
     // Exceptions
@@ -158,7 +205,7 @@ public class WeatherClient {
                 weatherToday.getTempMax()
         ) + "\n" + String.format(
                 res.getString("Visibility"),
-                weatherToday.getVisibilityDistance()
+                weatherToday.getVisibility()
         ) + "\n" + String.format(
                 res.getString("Pressure"),
                 weatherToday.getPressure()
@@ -171,16 +218,10 @@ public class WeatherClient {
 
     // Getters & setters
 
-    public WeatherToday getWeatherData() {
+    public WeatherToday getWeatherToday() {
         return weatherToday;
     }
-    public String getCity() {
-        return cityName;
-    }
-    public void setCity(String cityName) {
-        this.cityName = cityName;
-    }
-    public void setCityAndCheck(String cityName) throws WeatherException {
+    public void setCity(String cityName) throws WeatherException {
         String url = URL + "/weather?q="+cityName+"&appid="+ apiId +"&lang="+locale.getLanguage();
         String JsonString = connectHttpService(url);
 
@@ -192,7 +233,7 @@ public class WeatherClient {
                     jsonObject.get("message").toString()
             );
 
-        this.cityName = cityName;
+        weatherToday.setCity(cityName);
     }
     public void setLanguage(String langCode) throws WeatherException {
         var country = "";
