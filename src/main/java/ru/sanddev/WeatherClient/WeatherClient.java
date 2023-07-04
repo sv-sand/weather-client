@@ -104,7 +104,7 @@ public class WeatherClient {
         String jsonString;
 
         try {
-            jsonString = httpClient.execute(url);
+            jsonString = httpClient.doGetRequest(url);
         } catch (IOException e) {
             exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
             return new WeatherToday();
@@ -143,7 +143,7 @@ public class WeatherClient {
         String jsonString;
 
         try {
-            jsonString = httpClient.execute(url);
+            jsonString = httpClient.doGetRequest(url);
         } catch (IOException e) {
             exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
             return new WeatherHourForecast();
@@ -182,7 +182,7 @@ public class WeatherClient {
         String jsonString;
 
         try {
-            jsonString = httpClient.execute(url);
+            jsonString = httpClient.doGetRequest(url);
         } catch (IOException e) {
             exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
             return new WeatherDailyForecast();
@@ -202,24 +202,29 @@ public class WeatherClient {
 
     // Getters & setters
 
-    public void setLocale(Locale newLocale) throws WeatherException {
+    /**
+     * Change weather client locale
+     * @param locale - new locale
+     * @throws WeatherException - if locale is not support
+     */
+    public void setLocale(Locale locale) throws WeatherException {
         log.debug(
-                String.format("Language change begin, current %s, target %s", locale.getLanguage(), newLocale.getLanguage())
+                String.format("Language change begin, current %s, target %s", this.locale.getLanguage(), locale.getLanguage())
         );
 
-        if (locale == newLocale) {
+        if (this.locale == locale) {
             log.debug("Do not need change the language");
             return;
         }
 
         try {
-            LocaleCodes.valueOf(newLocale.toString());
+            LocaleCodes.valueOf(locale.toString());
         } catch (IllegalArgumentException e) {
-            exceptionHelper.raiseExceptionLangCode(newLocale.getLanguage());
+            exceptionHelper.raiseExceptionLangCode(locale.getLanguage());
             return;
         }
 
-        locale = newLocale;
+        this.locale = locale;
         exceptionHelper = new WeatherExceptionHelper(locale);
 
         log.debug("Language was changed");

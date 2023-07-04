@@ -1,9 +1,11 @@
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import ru.sanddev.WeatherClient.Exception.WeatherException;
 import ru.sanddev.WeatherClient.WeatherClient;
+import ru.sanddev.WeatherClient.objects.WeatherDailyForecast;
+import ru.sanddev.WeatherClient.objects.WeatherHourForecast;
+import ru.sanddev.WeatherClient.objects.WeatherToday;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,115 +22,141 @@ public class WeatherClientTest {
     private static final String CONFIG_FILE = "config/app.properties";
 
     WeatherClient client;
+    Properties config;
 
-    @Before
-    public void init(){
-        Properties config = new Properties();
+    public WeatherClientTest() {
+        config = new Properties();
 
         try (InputStream stream = new FileInputStream(CONFIG_FILE)) {
             config.load(stream);
         } catch (IOException e) {
-            Assert.fail("Attention! Can't find config file. Please make file ./config/config.properties according instruction by this program!");
+            Assertions.fail(
+                    String.format("Attention! Can't find config file. Please create file ./%s according instruction by this program!", CONFIG_FILE)
+            );
             return;
         }
-
         client = new WeatherClient(config.getProperty("apiId"));
     }
 
     // Today
 
-    private void todayCheck() {
+    private void todayCheck(String city) {
+        WeatherToday weather;
         try {
-            var weather = client.loadWeatherToday();
-            System.out.println(weather.toString());
+            weather = client.loadWeatherToday();
         } catch (WeatherException e) {
-            Assert.fail(e.getLocalizedMessage());
+            Assertions.fail(e.getLocalizedMessage());
+            return;
         }
+        System.out.println(weather.toString());
+
+        if (!weather.getCity().getName().equals(city))
+            Assertions.fail("Wrong city name");
     }
 
     @Test
     public void today() {
-        client.setCity("Moscow");
-        todayCheck();
+        var city = "Moscow";
+        client.setCity(city);
+        todayCheck(city);
     }
 
     @Test
     public void todayEn() {
+        var city = "Moscow";
         setLocale(Locale.ENGLISH);
         client.setCity("Moscow");
-        todayCheck();
+        todayCheck(city);
     }
 
     @Test
     public void todayRu() {
+        var city = "Москва";
         setLocale(new Locale("ru"));
-        client.setCity("Москва");
-        todayCheck();
+        client.setCity(city);
+        todayCheck(city);
     }
 
     // Hour forecast
 
-    private void hourForecastCheck() {
+    private void hourForecastCheck(String city) {
+        WeatherHourForecast weather;
         try {
-            var weather = client.loadWeatherHourForecast();
-            System.out.println(weather.toString());
+            weather = client.loadWeatherHourForecast();
         } catch (WeatherException e) {
-            Assert.fail(e.getLocalizedMessage());
+            Assertions.fail(e.getLocalizedMessage());
+            return;
         }
+
+        System.out.println(weather.toString());
+
+        if (!weather.getCity().getName().equals(city))
+            Assertions.fail("Wrong city name");
     }
 
     @Test
     public void hourForecast() {
-        client.setCity("Moscow");
-        hourForecastCheck();
+        var city = "Moscow";
+        client.setCity(city);
+        hourForecastCheck(city);
     }
 
     @Test
     public void hourForecastEn() {
+        var city = "Moscow";
         setLocale(Locale.ENGLISH);
-        client.setCity("Moscow");
-        hourForecastCheck();
+        client.setCity(city);
+        hourForecastCheck(city);
     }
 
     @Test
     public void hourForecastRu() {
+        var city = "Москва";
         setLocale(new Locale("ru"));
-        client.setCity("Москва");
-        hourForecastCheck();
+        client.setCity(city);
+        hourForecastCheck(city);
     }
 
     // Daily forecast
 
-    private void dailyForecastCheck() {
+    private void dailyForecastCheck(String city) {
+        WeatherDailyForecast weather;
         try {
-            var weather = client.loadWeatherDailyForecast();
-            System.out.println(weather.toString());
+            weather = client.loadWeatherDailyForecast();
         } catch (WeatherException e) {
-            Assert.fail(e.getLocalizedMessage());
+            Assertions.fail(e.getLocalizedMessage());
+            return;
         }
+        System.out.println(weather.toString());
+
+        if (!weather.getCity().getName().equals(city))
+            Assertions.fail("Wrong city name");
     }
 
-    @Ignore("Do need paid account Open weather")
+    @Disabled("Do need paid account Open weather")
     @Test
     public void dailyForecast() {
-        client.setCity("Moscow");
-        dailyForecastCheck();
+        var city = "Moscow";
+        client.setCity(city);
+        dailyForecastCheck(city);
     }
 
-    @Ignore("Do need paid account Open weather")
+    @Disabled("Do need paid account Open weather")
     @Test
     public void dailyForecastEn() {
+        var city = "Moscow";
         setLocale(new Locale("en"));
-        client.setCity("Moscow");
-        dailyForecastCheck();
+        client.setCity(city);
+        dailyForecastCheck(city);
     }
 
-    @Ignore("Do need paid account Open weather")
+    @Disabled("Do need paid account Open weather")
     @Test
     public void dailyForecastRu() {
+        var city = "Москва";
         setLocale(new Locale("ru"));
-        client.setCity("Москва");
-        dailyForecastCheck();
+        client.setCity(city);
+        dailyForecastCheck(city);
     }
 
     // Language
@@ -138,7 +166,7 @@ public class WeatherClientTest {
         try {
             client.setLocale(new Locale("ru"));
         } catch (WeatherException e) {
-            Assert.fail();
+            Assertions.fail();
         }
     }
 
@@ -149,10 +177,10 @@ public class WeatherClientTest {
         } catch (WeatherException e) {
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
-    // City
+    // Wrong city
 
     private void wrongCityCheck() {
         try {
@@ -160,7 +188,7 @@ public class WeatherClientTest {
         } catch (WeatherException e) {
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -189,7 +217,7 @@ public class WeatherClientTest {
         try {
             client.setLocale(locale);
         } catch (WeatherException e) {
-            Assert.fail(e.getLocalizedMessage());
+            Assertions.fail(e.getLocalizedMessage());
         }
     }
 }
