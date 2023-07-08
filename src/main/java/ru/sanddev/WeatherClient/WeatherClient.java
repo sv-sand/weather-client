@@ -5,12 +5,6 @@ import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import ru.sanddev.WeatherClient.Exception.WeatherException;
 import ru.sanddev.WeatherClient.Exception.WeatherExceptionHelper;
 import ru.sanddev.WeatherClient.json.DailyForecastListPositionDeserializer;
@@ -51,7 +45,12 @@ public class WeatherClient {
     private Locale locale;
 
     private WeatherExceptionHelper exceptionHelper;
-    private DefaultHttpClient client;
+    private HttpService httpService;
+
+    public enum LocaleCodes {
+        en,
+        ru
+    }
 
     // Constructors
 
@@ -87,8 +86,18 @@ public class WeatherClient {
 
         locale = DEFAULT_LOCALE;
         exceptionHelper = new WeatherExceptionHelper(locale);
+        httpService = new HttpService();
+    }
 
-        initHttpClient();
+    private void checkHttpRequestResult(String jsonString) throws WeatherException {
+        log.debug("Request result checking");
+
+        Gson gson = new Gson();
+        HttpRequestResult result = gson.fromJson(jsonString, HttpRequestResult.class);
+
+        if (result.getCod() != 200) {
+            exceptionHelper.raiseExceptionHttp(result.getCod(), result.getMessage());
+        }
     }
 
     /**
@@ -97,7 +106,14 @@ public class WeatherClient {
      */
     public WeatherToday loadWeatherToday() throws WeatherException {
         String url = URL + "/weather?q=" + city + "&appid=" + apiId + "&lang=" + locale.getLanguage();
-        String jsonString = connectHttpService(url);
+        String jsonString;
+
+        try {
+            jsonString = httpService.doGetRequest(url);
+        } catch (IOException e) {
+            exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
+            return new WeatherToday();
+        }
 
         checkHttpRequestResult(jsonString);
 
@@ -129,7 +145,14 @@ public class WeatherClient {
      */
     public WeatherHourForecast loadWeatherHourForecast(int timeStampCount) throws WeatherException {
         String url = URL + "/forecast?q=" + city + "&cnt=" + timeStampCount + "&appid=" + apiId + "&lang=" + locale.getLanguage();
-        String jsonString = connectHttpService(url);
+        String jsonString;
+
+        try {
+            jsonString = httpService.doGetRequest(url);
+        } catch (IOException e) {
+            exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
+            return new WeatherHourForecast();
+        }
 
         checkHttpRequestResult(jsonString);
 
@@ -161,7 +184,14 @@ public class WeatherClient {
      */
     public WeatherDailyForecast loadWeatherDailyForecast(int timeStampCount) throws WeatherException {
         String url = URL + "/forecast/daily?q=" + city + "&cnt=" + timeStampCount + "&appid=" + apiId + "&lang=" + locale.getLanguage();
-        String jsonString = connectHttpService(url);
+        String jsonString;
+
+        try {
+            jsonString = httpService.doGetRequest(url);
+        } catch (IOException e) {
+            exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
+            return new WeatherDailyForecast();
+        }
 
         checkHttpRequestResult(jsonString);
 
@@ -175,86 +205,33 @@ public class WeatherClient {
         return weather;
     }
 
-    // HTTP client
-
-    private void initHttpClient() {
-        log.debug("HTTP client: Prepare ssl");
-        SSLSocketFactory ssl = SSLSocketFactory.getSocketFactory();
-        ssl.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        Scheme httpsScheme = new Scheme("https", ssl, 443);
-
-        log.debug("HTTP client: Prepare client");
-        client = new DefaultHttpClient();
-        client.getConnectionManager().getSchemeRegistry().register(httpsScheme);
-    }
-
-    private String connectHttpService(String url) throws WeatherException {
-        log.debug(String.format("HTTP connecting to %s", url));
-
-        String result = "";
-
-        HttpGet request = new HttpGet(url);
-        HttpResponse response;
-
-        try {
-            response = client.execute(request);
-        } catch (IOException e) {
-            exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
-            return result;
-        }
-
-        log.debug("HTTP connecting successful");
-
-        try {
-            result = EntityUtils.toString(response.getEntity(), "UTF-8");
-        } catch (IOException e) {
-            exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
-        }
-
-        log.debug("HTTP response was retrieved");
-        return result;
-    }
-
-    private void checkHttpRequestResult(String jsonString) throws WeatherException {
-        log.debug("Request result checking");
-
-        Gson gson = new Gson();
-        HttpRequestResult result = gson.fromJson(jsonString, HttpRequestResult.class);
-
-        if (result.getCod() != 200) {
-            exceptionHelper.raiseExceptionHttp(result.getCod(), result.getMessage());
-        }
-    }
-
     // Getters & setters
 
-    public void setLocale(Locale newLocale) throws WeatherException {
+    /**
+     * Change weather client locale
+     * @param locale - new locale
+     * @throws WeatherException - if locale is not support
+     */
+    public void setLocale(Locale locale) throws WeatherException {
         log.debug(
-                String.format("Language change begin, current %s, target %s", locale.getLanguage(), newLocale.getLanguage())
+                String.format("Language change begin, current %s, target %s", this.locale.getLanguage(), locale.getLanguage())
         );
 
-        if (locale == newLocale) {
+        if (this.locale == locale) {
             log.debug("Do not need change the language");
             return;
         }
 
         try {
-            LocaleCodes.valueOf(newLocale.toString());
+            LocaleCodes.valueOf(locale.getLanguage());
         } catch (IllegalArgumentException e) {
-            exceptionHelper.raiseExceptionLangCode(newLocale.getLanguage());
+            exceptionHelper.raiseExceptionLangCode(locale.getLanguage());
             return;
         }
 
-        locale = newLocale;
+        this.locale = locale;
         exceptionHelper = new WeatherExceptionHelper(locale);
 
         log.debug("Language was changed");
-    }
-
-    // Inner objects
-
-    public enum LocaleCodes {
-        en,
-        ru
     }
 }
