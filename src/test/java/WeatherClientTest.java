@@ -40,7 +40,7 @@ public class WeatherClientTest {
 
     // Today
 
-    private void todayCheck(String city) {
+    protected void todayCheck(String city) {
         WeatherToday weather;
         try {
             weather = client.loadWeatherToday();
@@ -65,7 +65,7 @@ public class WeatherClientTest {
     public void todayEn() {
         var city = "Moscow";
         setLocale(Locale.ENGLISH);
-        client.setCity("Moscow");
+        client.setCity(city);
         todayCheck(city);
     }
 
@@ -79,7 +79,7 @@ public class WeatherClientTest {
 
     // Hour forecast
 
-    private void hourForecastCheck(String city) {
+    protected void hourForecastCheck(String city) {
         WeatherHourForecast weather;
         try {
             weather = client.loadWeatherHourForecast();
@@ -119,7 +119,7 @@ public class WeatherClientTest {
 
     // Daily forecast
 
-    private void dailyForecastCheck(String city) {
+    protected void dailyForecastCheck(String city) {
         WeatherDailyForecast weather;
         try {
             weather = client.loadWeatherDailyForecast();
@@ -164,6 +164,7 @@ public class WeatherClientTest {
     @Test
     public void changeLanguage() {
         try {
+            client.setLocale(new Locale("en"));
             client.setLocale(new Locale("ru"));
         } catch (WeatherException e) {
             Assertions.fail();

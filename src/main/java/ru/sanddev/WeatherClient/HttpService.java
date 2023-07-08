@@ -15,10 +15,10 @@ import java.io.IOException;
  */
 
 @Log4j
-public class HttpClient {
+public class HttpService {
 
     public String doGetRequest(String url) throws IOException {
-        log.debug(String.format("Get request %s", url));
+        log.debug(String.format("Get request: %s", url));
 
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet request = new HttpGet(url);
@@ -26,10 +26,9 @@ public class HttpClient {
         log.debug("HTTP connection successful");
 
         String result = EntityUtils.toString(response.getEntity(), "UTF-8");
-        log.debug("HTTP response was retrieved");
+        log.debug(String.format("HTTP response was retrieved: %s", result));
 
         client.close();
-        log.debug("Close HTTP connection");
 
         return result;
     }

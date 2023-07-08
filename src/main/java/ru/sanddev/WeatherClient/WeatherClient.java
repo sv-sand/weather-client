@@ -45,7 +45,12 @@ public class WeatherClient {
     private Locale locale;
 
     private WeatherExceptionHelper exceptionHelper;
-    private HttpClient httpClient;
+    private HttpService httpService;
+
+    public enum LocaleCodes {
+        en,
+        ru
+    }
 
     // Constructors
 
@@ -81,7 +86,7 @@ public class WeatherClient {
 
         locale = DEFAULT_LOCALE;
         exceptionHelper = new WeatherExceptionHelper(locale);
-        httpClient = new HttpClient();
+        httpService = new HttpService();
     }
 
     private void checkHttpRequestResult(String jsonString) throws WeatherException {
@@ -104,7 +109,7 @@ public class WeatherClient {
         String jsonString;
 
         try {
-            jsonString = httpClient.doGetRequest(url);
+            jsonString = httpService.doGetRequest(url);
         } catch (IOException e) {
             exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
             return new WeatherToday();
@@ -143,7 +148,7 @@ public class WeatherClient {
         String jsonString;
 
         try {
-            jsonString = httpClient.doGetRequest(url);
+            jsonString = httpService.doGetRequest(url);
         } catch (IOException e) {
             exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
             return new WeatherHourForecast();
@@ -182,7 +187,7 @@ public class WeatherClient {
         String jsonString;
 
         try {
-            jsonString = httpClient.doGetRequest(url);
+            jsonString = httpService.doGetRequest(url);
         } catch (IOException e) {
             exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
             return new WeatherDailyForecast();
@@ -218,7 +223,7 @@ public class WeatherClient {
         }
 
         try {
-            LocaleCodes.valueOf(locale.toString());
+            LocaleCodes.valueOf(locale.getLanguage());
         } catch (IllegalArgumentException e) {
             exceptionHelper.raiseExceptionLangCode(locale.getLanguage());
             return;
@@ -228,12 +233,5 @@ public class WeatherClient {
         exceptionHelper = new WeatherExceptionHelper(locale);
 
         log.debug("Language was changed");
-    }
-
-    // Inner objects
-
-    public enum LocaleCodes {
-        en,
-        ru
     }
 }
