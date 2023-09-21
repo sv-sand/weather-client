@@ -50,6 +50,9 @@ public class WeatherClientTest {
         }
         System.out.println(weather.toString());
 
+        if (weather.isEmpty())
+            Assertions.fail("Weather is empty");
+
         if (!weather.getCity().getName().equals(city))
             Assertions.fail("Wrong city name");
     }
@@ -90,6 +93,9 @@ public class WeatherClientTest {
 
         System.out.println(weather.toString());
 
+        if (weather.isEmpty())
+            Assertions.fail("Weather is empty");
+
         if (!weather.getCity().getName().equals(city))
             Assertions.fail("Wrong city name");
     }
@@ -129,6 +135,9 @@ public class WeatherClientTest {
         }
         System.out.println(weather.toString());
 
+        if (weather.isEmpty())
+            Assertions.fail("Weather is empty");
+
         if (!weather.getCity().getName().equals(city))
             Assertions.fail("Wrong city name");
     }
@@ -161,14 +170,18 @@ public class WeatherClientTest {
 
     // Language
 
+    private void setLocale(Locale locale) {
+        try {
+            client.setLocale(locale);
+        } catch (WeatherException e) {
+            Assertions.fail(e.getLocalizedMessage());
+        }
+    }
+
     @Test
     public void changeLanguage() {
-        try {
-            client.setLocale(new Locale("en"));
-            client.setLocale(new Locale("ru"));
-        } catch (WeatherException e) {
-            Assertions.fail();
-        }
+        setLocale(new Locale("en"));
+        setLocale(new Locale("ru"));
     }
 
     @Test
@@ -181,15 +194,23 @@ public class WeatherClientTest {
         Assertions.fail();
     }
 
-    // Wrong city
+    // Errors
 
-    private void wrongCityCheck() {
+    @Test
+    public void emptyApiId() {
+        WeatherClient wrongClient = new WeatherClient();
+
         try {
-            client.loadWeatherToday();
+            wrongClient.loadWeatherToday();
         } catch (WeatherException e) {
             return;
         }
         Assertions.fail();
+    }
+
+    @Test
+    public void emptyCity() {
+        wrongCityCheck();
     }
 
     @Test
@@ -212,13 +233,13 @@ public class WeatherClientTest {
         wrongCityCheck();
     }
 
-    // Service methods
-
-    private void setLocale(Locale locale) {
+    private void wrongCityCheck() {
         try {
-            client.setLocale(locale);
+            client.loadWeatherToday();
         } catch (WeatherException e) {
-            Assertions.fail(e.getLocalizedMessage());
+            return;
         }
+        Assertions.fail();
     }
+
 }

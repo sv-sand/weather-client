@@ -30,11 +30,34 @@ public class WeatherExceptionHelper {
 
         throw exception;
     }
+
+    public void raiseExceptionApiId(String appId) throws WeatherException {
+        String msg = exceptionBundle.getString("ErrorApiId");
+
+        WeatherException exception =  new WeatherException(
+                String.format(msg, appId)
+        );
+        log.error(exception.getLocalizedMessage(), exception);
+
+        throw exception;
+    }
+
     public void raiseExceptionLangCode(String langCode) throws WeatherException {
         String msg = exceptionBundle.getString("ErrorLangCode");
 
         WeatherException exception =  new WeatherException(
                 String.format(msg, langCode)
+        );
+        log.error(exception.getLocalizedMessage(), exception);
+
+        throw exception;
+    }
+
+    public void raiseExceptionCity(String cityName) throws WeatherException {
+        String msg = exceptionBundle.getString("ErrorCity");
+
+        WeatherException exception =  new WeatherException(
+                String.format(msg, cityName)
         );
         log.error(exception.getLocalizedMessage(), exception);
 

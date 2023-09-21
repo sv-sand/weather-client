@@ -28,8 +28,8 @@ import java.util.Locale;
 @Log4j
 public class WeatherClient {
 
-    public final static TemperatureUnits DEFAULT_TEMPERATURE_UNITS = TemperatureUnits.CELSIUS;
     public final static String URL = "https://api.openweathermap.org/data/2.5";
+    public final static TemperatureUnits DEFAULT_TEMPERATURE_UNITS = TemperatureUnits.CELSIUS;
     public final static Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     @Getter @Setter
@@ -55,12 +55,15 @@ public class WeatherClient {
     // Constructors
 
     public WeatherClient() {
+        this.apiId = "";
+        this.city = "";
         this.tempUnits = DEFAULT_TEMPERATURE_UNITS;
         init();
     }
 
     public WeatherClient(String apiId) {
         this.apiId = apiId;
+        this.city = "";
         this.tempUnits = DEFAULT_TEMPERATURE_UNITS;
         init();
     }
@@ -89,22 +92,13 @@ public class WeatherClient {
         httpService = new HttpService();
     }
 
-    private void checkHttpRequestResult(String jsonString) throws WeatherException {
-        log.debug("Request result checking");
-
-        Gson gson = new Gson();
-        HttpRequestResult result = gson.fromJson(jsonString, HttpRequestResult.class);
-
-        if (result.getCod() != 200) {
-            exceptionHelper.raiseExceptionHttp(result.getCod(), result.getMessage());
-        }
-    }
-
     /**
      * Load current weather data from <a href="https://openweathermap.org">https://openweathermap.org</a> API
      * @return weather data object
      */
     public WeatherToday loadWeatherToday() throws WeatherException {
+        beforeLoad();
+
         String url = URL + "/weather?q=" + city + "&appid=" + apiId + "&lang=" + locale.getLanguage();
         String jsonString;
 
@@ -123,8 +117,8 @@ public class WeatherClient {
                 .create();
 
         WeatherToday weather = gson.fromJson(jsonString, WeatherToday.class);
-        weather.convertTemperatureUnits(tempUnits);
 
+        afterLoad(weather);
         return weather;
     }
 
@@ -144,6 +138,8 @@ public class WeatherClient {
      * @return weather hourly forecast data object
      */
     public WeatherHourForecast loadWeatherHourForecast(int timeStampCount) throws WeatherException {
+        beforeLoad();
+
         String url = URL + "/forecast?q=" + city + "&cnt=" + timeStampCount + "&appid=" + apiId + "&lang=" + locale.getLanguage();
         String jsonString;
 
@@ -162,8 +158,8 @@ public class WeatherClient {
                 .create();
 
         WeatherHourForecast weather = gson.fromJson(jsonString, WeatherHourForecast.class);
-        weather.convertTemperatureUnits(tempUnits);
 
+        afterLoad(weather);
         return weather;
     }
 
@@ -183,6 +179,8 @@ public class WeatherClient {
      * @return weather daily forecast data object
      */
     public WeatherDailyForecast loadWeatherDailyForecast(int timeStampCount) throws WeatherException {
+        beforeLoad();
+
         String url = URL + "/forecast/daily?q=" + city + "&cnt=" + timeStampCount + "&appid=" + apiId + "&lang=" + locale.getLanguage();
         String jsonString;
 
@@ -200,9 +198,33 @@ public class WeatherClient {
                 .create();
 
         WeatherDailyForecast weather = gson.fromJson(jsonString, WeatherDailyForecast.class);
-        weather.convertTemperatureUnits(tempUnits);
 
+        afterLoad(weather);
         return weather;
+    }
+
+    private void checkHttpRequestResult(String jsonString) throws WeatherException {
+        log.debug("Request result checking");
+
+        Gson gson = new Gson();
+        HttpRequestResult result = gson.fromJson(jsonString, HttpRequestResult.class);
+
+        if (result.getCod() != 200) {
+            exceptionHelper.raiseExceptionHttp(result.getCod(), result.getMessage());
+        }
+    }
+
+    private void beforeLoad()  throws WeatherException {
+        if (apiId.equals(""))
+            exceptionHelper.raiseExceptionApiId("");
+        if (city.equals(""))
+            exceptionHelper.raiseExceptionCity("");
+        if (tempUnits == null)
+            exceptionHelper.raiseExceptionLangCode("");
+    }
+
+    private void afterLoad(WeatherData weather) {
+        weather.convertTemperatureUnits(tempUnits);
     }
 
     // Getters & setters
