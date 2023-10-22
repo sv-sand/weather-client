@@ -21,11 +21,11 @@ public class WeatherTodayDeserializer implements JsonDeserializer<WeatherToday> 
         var dt = jsonObject.get("dt").getAsLong();
         weather.setDate(new Date(dt * 1000 ));
 
-        City city = new City();
+        CityData city = new CityData();
         city.setName(jsonObject.get("name").getAsString());
         city.setTimezone(jsonObject.get("timezone").getAsLong() / 3600);
         city.setCoord(
-                jsonDeserializationContext.deserialize(jsonObject.get("coord"), Coordinates.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("coord"), CoordinatesData.class)
         );
         weather.setCity(city);
 
@@ -35,19 +35,19 @@ public class WeatherTodayDeserializer implements JsonDeserializer<WeatherToday> 
 
         for (JsonElement obj: jsonObject.get("weather").getAsJsonArray())
             weather.setWeather(
-                jsonDeserializationContext.deserialize(obj.getAsJsonObject(), Description.class)
+                jsonDeserializationContext.deserialize(obj.getAsJsonObject(), DescriptionData.class)
             );
 
         weather.setBase(jsonObject.get("base").getAsString());
 
         weather.setMain(
-                jsonDeserializationContext.deserialize(jsonObject.get("main"), Main.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("main"), MainData.class)
         );
 
         weather.setVisibility(jsonObject.get("visibility").getAsLong());
 
         weather.setWind(
-                jsonDeserializationContext.deserialize(jsonObject.get("wind"), Wind.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("wind"), WindData.class)
         );
 
         weather.setClouds(
@@ -55,11 +55,11 @@ public class WeatherTodayDeserializer implements JsonDeserializer<WeatherToday> 
         );
 
         weather.setRain(
-                jsonDeserializationContext.deserialize(jsonObject.get("rain"), Rain.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("rain"), RainData.class)
         );
 
         weather.setSnow(
-                jsonDeserializationContext.deserialize(jsonObject.get("snow"), Snow.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("snow"), SnowData.class)
         );
 
         return weather;

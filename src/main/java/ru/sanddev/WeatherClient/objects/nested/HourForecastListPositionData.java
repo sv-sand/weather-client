@@ -12,22 +12,22 @@ import java.util.Date;
 
 @Log4j
 @Data
-public class HourForecastListPosition {
+public class HourForecastListPositionData {
 
     // Time of data forecasted
     private Date date;
 
     // General parameters
-    private Main main;
+    private MainData main;
 
     // More info Weather condition codes
-    private Description weather;
+    private DescriptionData weather;
 
     // Cloudiness, % ("all" = 100)
     private double clouds;
 
     // Wind info
-    private Wind wind;
+    private WindData wind;
 
     // Visibility, meter. The maximum value of the visibility is 10km
     private long visibility;
@@ -36,8 +36,16 @@ public class HourForecastListPosition {
     private double pop;
 
     // Rain volume for the last hours, mm ("1h" = 3.16)
-    private Rain rain;
+    private RainData rain;
 
     // Snow volume for the last hours, mm ("1h" = 3.16)
-    private Snow snow;
+    private SnowData snow;
+
+    /**
+     * Check empty or filled object
+     * @return true - if empty object, false - if object contains any data
+     */
+    public boolean isEmpty() {
+        return date == null;
+    }
 }

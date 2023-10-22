@@ -11,45 +11,45 @@ import java.util.Date;
  */
 
 @Data
-public class WeatherToday implements WeatherData{
+public class WeatherToday extends WeatherData{
 
-    private City city;
+    private CityData city;
 
     // Time of data calculation, unix, UTC
     private Date date;
 
-    // Shift in seconds from UTC
+    // Shift in hours from UTC
     private long timezone;
 
     // System data
     private SystemData sys;
 
     // Coordinates
-    private Coordinates coord;
+    private CoordinatesData coord;
 
     // More info Weather condition codes
-    private Description weather;
+    private DescriptionData weather;
 
     // Internal parameter
     private String base;
 
     // General parameters
-    private Main main;
+    private MainData main;
 
     // Visibility, meter. The maximum value of the visibility is 10km
     private long visibility;
 
     // Wind info
-    private Wind wind;
+    private WindData wind;
 
     // Cloudiness, % ("all" = 100)
     private double clouds;
 
     // Rain volume for the last hours, mm ("1h" = 3.16)
-    private Rain rain;
+    private RainData rain;
 
     // Snow volume for the last hours, mm ("1h" = 3.16)
-    private Snow snow;
+    private SnowData snow;
 
     // Methods
 
@@ -61,5 +61,10 @@ public class WeatherToday implements WeatherData{
     @Override
     public void convertTemperatureUnits(TemperatureUnits targetTempUnits) {
         getMain().convertTemperature(targetTempUnits);
+    }
+
+    @Override
+    public void convertPressureUnits(PressureUnits targetPressureUnits) {
+        getMain().convertPressure(targetPressureUnits);
     }
 }

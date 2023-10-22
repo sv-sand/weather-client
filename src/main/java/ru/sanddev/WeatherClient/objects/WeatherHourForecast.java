@@ -2,8 +2,8 @@ package ru.sanddev.WeatherClient.objects;
 
 import lombok.Data;
 import lombok.extern.log4j.Log4j;
-import ru.sanddev.WeatherClient.objects.nested.City;
-import ru.sanddev.WeatherClient.objects.nested.HourForecastListPosition;
+import ru.sanddev.WeatherClient.objects.nested.CityData;
+import ru.sanddev.WeatherClient.objects.nested.HourForecastListPositionData;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,11 +15,11 @@ import java.util.Set;
 
 @Log4j
 @Data
-public class WeatherHourForecast implements WeatherData {
+public class WeatherHourForecast extends WeatherData {
 
-    private City city;
+    private CityData city;
 
-    private Set<HourForecastListPosition> list;
+    private Set<HourForecastListPositionData> list;
 
     public WeatherHourForecast() {
         list = new HashSet<>();
@@ -37,6 +37,14 @@ public class WeatherHourForecast implements WeatherData {
         for (var item: list) {
             log.debug("Prepare temperature conversion by " + item.getDate());
             item.getMain().convertTemperature(targetTempUnits);
+        }
+    }
+
+    @Override
+    public void convertPressureUnits(PressureUnits targetPressureUnits) {
+        for (var item: list) {
+            log.debug("Prepare pressure conversion by " + item.getDate());
+            item.getMain().convertPressure(targetPressureUnits);
         }
     }
 }

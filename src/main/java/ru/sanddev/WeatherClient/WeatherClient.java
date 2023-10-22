@@ -7,14 +7,12 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 import ru.sanddev.WeatherClient.Exception.WeatherException;
 import ru.sanddev.WeatherClient.Exception.WeatherExceptionHelper;
-import ru.sanddev.WeatherClient.json.DailyForecastListPositionDeserializer;
 import ru.sanddev.WeatherClient.json.HourForecastListPositionDeserializer;
 import ru.sanddev.WeatherClient.json.WeatherHourForecastDeserializer;
 import ru.sanddev.WeatherClient.json.WeatherTodayDeserializer;
 import ru.sanddev.WeatherClient.json.nested.SystemDataDeserializer;
 import ru.sanddev.WeatherClient.objects.*;
-import ru.sanddev.WeatherClient.objects.nested.DailyForecastListPosition;
-import ru.sanddev.WeatherClient.objects.nested.HourForecastListPosition;
+import ru.sanddev.WeatherClient.objects.nested.HourForecastListPositionData;
 import ru.sanddev.WeatherClient.objects.nested.SystemData;
 
 import java.io.IOException;
@@ -30,6 +28,7 @@ public class WeatherClient {
 
     public final static String URL = "https://api.openweathermap.org/data/2.5";
     public final static TemperatureUnits DEFAULT_TEMPERATURE_UNITS = TemperatureUnits.CELSIUS;
+    public final static PressureUnits DEFAULT_PRESSURE_UNITS = PressureUnits.MmHg;
     public final static Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     @Getter @Setter
@@ -40,6 +39,9 @@ public class WeatherClient {
 
     @Getter @Setter
     private TemperatureUnits tempUnits;
+
+    @Getter @Setter
+    private PressureUnits pressureUnits;
 
     @Getter
     private Locale locale;
@@ -58,6 +60,8 @@ public class WeatherClient {
         this.apiId = "";
         this.city = "";
         this.tempUnits = DEFAULT_TEMPERATURE_UNITS;
+        this.pressureUnits = DEFAULT_PRESSURE_UNITS;
+
         init();
     }
 
@@ -65,6 +69,8 @@ public class WeatherClient {
         this.apiId = apiId;
         this.city = "";
         this.tempUnits = DEFAULT_TEMPERATURE_UNITS;
+        this.pressureUnits = DEFAULT_PRESSURE_UNITS;
+
         init();
     }
 
@@ -72,13 +78,8 @@ public class WeatherClient {
         this.apiId = apiId;
         this.city = cityName;
         this.tempUnits = DEFAULT_TEMPERATURE_UNITS;
-        init();
-    }
+        this.pressureUnits = DEFAULT_PRESSURE_UNITS;
 
-    public WeatherClient(String apiId, String cityName, TemperatureUnits tempUnits) {
-        this.apiId = apiId;
-        this.city = cityName;
-        this.tempUnits = tempUnits;
         init();
     }
 
@@ -154,50 +155,10 @@ public class WeatherClient {
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(WeatherHourForecast.class, new WeatherHourForecastDeserializer())
-                .registerTypeAdapter(HourForecastListPosition.class, new HourForecastListPositionDeserializer())
+                .registerTypeAdapter(HourForecastListPositionData.class, new HourForecastListPositionDeserializer())
                 .create();
 
         WeatherHourForecast weather = gson.fromJson(jsonString, WeatherHourForecast.class);
-
-        afterLoad(weather);
-        return weather;
-    }
-
-    /**
-     * Load weather daily forecast data from <a href="https://openweathermap.org">https://openweathermap.org</a> API with 16 days duration<br>
-     * <b>IMPORTANT! Do need paid account on <a href="https://openweathermap.org">https://openweathermap.org</a>, if don't have a paid account you will get an error "Invalid API key"</b>
-     * @return weather daily forecast data object
-     */
-    public WeatherDailyForecast loadWeatherDailyForecast() throws WeatherException {
-        return loadWeatherDailyForecast(16);
-    }
-
-    /**
-     * Load weather daily forecast data from <a href="https://openweathermap.org">https://openweathermap.org</a> API.<br>
-     * <b>IMPORTANT! Do need paid account on <a href="https://openweathermap.org">https://openweathermap.org</a>, if don't have a paid account you will get an error "Invalid API key"</b>
-     * @param timeStampCount a count of days forecast
-     * @return weather daily forecast data object
-     */
-    public WeatherDailyForecast loadWeatherDailyForecast(int timeStampCount) throws WeatherException {
-        beforeLoad();
-
-        String url = URL + "/forecast/daily?q=" + city + "&cnt=" + timeStampCount + "&appid=" + apiId + "&lang=" + locale.getLanguage();
-        String jsonString;
-
-        try {
-            jsonString = httpService.doGetRequest(url);
-        } catch (IOException e) {
-            exceptionHelper.raiseExceptionConnection(e, e.getLocalizedMessage());
-            return new WeatherDailyForecast();
-        }
-
-        checkHttpRequestResult(jsonString);
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(DailyForecastListPosition.class, new DailyForecastListPositionDeserializer())
-                .create();
-
-        WeatherDailyForecast weather = gson.fromJson(jsonString, WeatherDailyForecast.class);
 
         afterLoad(weather);
         return weather;
@@ -219,40 +180,39 @@ public class WeatherClient {
             exceptionHelper.raiseExceptionApiId("");
         if (city.equals(""))
             exceptionHelper.raiseExceptionCity("");
-        if (tempUnits == null)
-            exceptionHelper.raiseExceptionLangCode("");
     }
 
     private void afterLoad(WeatherData weather) {
         weather.convertTemperatureUnits(tempUnits);
+        weather.convertPressureUnits(pressureUnits);
     }
 
     // Getters & setters
 
     /**
      * Change weather client locale
-     * @param locale - new locale
+     * @param newLocale - new locale
      * @throws WeatherException - if locale is not support
      */
-    public void setLocale(Locale locale) throws WeatherException {
+    public void setLocale(Locale newLocale) throws WeatherException {
         log.debug(
-                String.format("Language change begin, current %s, target %s", this.locale.getLanguage(), locale.getLanguage())
+                String.format("Language change begin, current %s, target %s", locale.getLanguage(), newLocale.getLanguage())
         );
 
-        if (this.locale == locale) {
+        if (locale == newLocale) {
             log.debug("Do not need change the language");
             return;
         }
 
         try {
-            LocaleCodes.valueOf(locale.getLanguage());
+            LocaleCodes.valueOf(newLocale.getLanguage());
         } catch (IllegalArgumentException e) {
-            exceptionHelper.raiseExceptionLangCode(locale.getLanguage());
+            exceptionHelper.raiseExceptionLocale(newLocale.toString());
             return;
         }
 
-        this.locale = locale;
-        exceptionHelper = new WeatherExceptionHelper(locale);
+        locale = newLocale;
+        exceptionHelper = new WeatherExceptionHelper(newLocale);
 
         log.debug("Language was changed");
     }

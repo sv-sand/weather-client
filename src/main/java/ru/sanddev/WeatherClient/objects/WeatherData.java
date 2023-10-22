@@ -1,8 +1,22 @@
 package ru.sanddev.WeatherClient.objects;
 
-public interface WeatherData {
+public abstract class WeatherData {
 
-    boolean isEmpty();
+    /**
+     * Check empty or filled object
+     * @return true - if empty object, false - if object contains any data
+     */
+    public abstract boolean isEmpty();
 
-    void convertTemperatureUnits(TemperatureUnits targetTempUnits);
+    /**
+     * Method convert temperature to another measure unit
+     * @param targetTempUnit - new measure unit
+     */
+    public abstract void convertTemperatureUnits(TemperatureUnits targetTempUnit);
+
+    /**
+     * Method convert pressure to another measure unit
+     * @param targetPressureUnit - new measure unit
+     */
+    public abstract void convertPressureUnits(PressureUnits targetPressureUnit);
 }

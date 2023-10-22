@@ -13,11 +13,19 @@ import java.util.Date;
 public class SystemData {
 
     // Country code (GB, JP etc.)
-    private String country;
+    private String country = "";
 
     // Sunrise time, unix, UTC
     private Date sunrise;
 
     // Sunset time, unix, UTC
     private Date sunset;
+
+    /**
+     * Check empty or filled object
+     * @return true - if empty object, false - if object contains any data
+     */
+    public boolean isEmpty() {
+        return country.isEmpty() && sunrise == null && sunset == null;
+    }
 }

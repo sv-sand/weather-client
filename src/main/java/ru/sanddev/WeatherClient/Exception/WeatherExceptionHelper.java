@@ -42,8 +42,8 @@ public class WeatherExceptionHelper {
         throw exception;
     }
 
-    public void raiseExceptionLangCode(String langCode) throws WeatherException {
-        String msg = exceptionBundle.getString("ErrorLangCode");
+    public void raiseExceptionLocale(String langCode) throws WeatherException {
+        String msg = exceptionBundle.getString("ErrorLocale");
 
         WeatherException exception =  new WeatherException(
                 String.format(msg, langCode)

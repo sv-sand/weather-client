@@ -8,7 +8,7 @@ import lombok.Data;
  */
 
 @Data
-public class Wind {
+public class WindData {
 
     // Wind speed. Unit Default: meter/sec, Metric: meter/sec, Imperial: miles/hour.
     private double speed;
@@ -18,4 +18,12 @@ public class Wind {
 
     // Wind gust. Unit Default: meter/sec, Metric: meter/sec, Imperial: miles/hour
     private double gust;
+
+    /**
+     * Check empty or filled object
+     * @return true - if empty object, false - if object contains any data
+     */
+    public boolean isEmpty() {
+        return speed == 0 && deg == 0 && gust == 0;
+    }
 }

@@ -11,28 +11,28 @@ import java.util.Date;
  * @since 30.04.2023
  */
 
-public class HourForecastListPositionDeserializer implements JsonDeserializer<HourForecastListPosition> {
+public class HourForecastListPositionDeserializer implements JsonDeserializer<HourForecastListPositionData> {
     @Override
-    public HourForecastListPosition deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public HourForecastListPositionData deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        HourForecastListPosition pos = new HourForecastListPosition();
+        HourForecastListPositionData pos = new HourForecastListPositionData();
 
         var dt = jsonObject.get("dt").getAsLong();
         pos.setDate(new Date(dt * 1000 ));
 
         for (JsonElement obj: jsonObject.get("weather").getAsJsonArray())
             pos.setWeather(
-                jsonDeserializationContext.deserialize(obj.getAsJsonObject(), Description.class)
+                jsonDeserializationContext.deserialize(obj.getAsJsonObject(), DescriptionData.class)
             );
 
         pos.setMain(
-                jsonDeserializationContext.deserialize(jsonObject.get("main"), Main.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("main"), MainData.class)
         );
 
         pos.setVisibility(jsonObject.get("visibility").getAsLong());
 
         pos.setWind(
-                jsonDeserializationContext.deserialize(jsonObject.get("wind"), Wind.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("wind"), WindData.class)
         );
 
         pos.setClouds(
@@ -42,11 +42,11 @@ public class HourForecastListPositionDeserializer implements JsonDeserializer<Ho
         pos.setPop(jsonObject.get("pop").getAsDouble());
 
         pos.setRain(
-                jsonDeserializationContext.deserialize(jsonObject.get("rain"), Rain.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("rain"), RainData.class)
         );
 
         pos.setSnow(
-                jsonDeserializationContext.deserialize(jsonObject.get("snow"), Snow.class)
+                jsonDeserializationContext.deserialize(jsonObject.get("snow"), SnowData.class)
         );
 
         return pos;

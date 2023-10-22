@@ -1,23 +1,13 @@
 # InteleiJ Idea
 /.idea/
-*.iml
 /target/
 
 # Project files
 /logs/
 /out/
-/db/
-/config/
 
-# Java
-*.class
-*.jar
-*.war
-*.nar
-*.ear
+# Secrets
+config.properties
 
-# System
-*.zip
-*.tar.gz
-*.rar
+
 

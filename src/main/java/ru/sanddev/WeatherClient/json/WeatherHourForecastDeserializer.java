@@ -1,9 +1,9 @@
 package ru.sanddev.WeatherClient.json;
 
 import com.google.gson.*;
-import ru.sanddev.WeatherClient.objects.nested.City;
+import ru.sanddev.WeatherClient.objects.nested.CityData;
 import ru.sanddev.WeatherClient.objects.WeatherHourForecast;
-import ru.sanddev.WeatherClient.objects.nested.HourForecastListPosition;
+import ru.sanddev.WeatherClient.objects.nested.HourForecastListPositionData;
 
 import java.lang.reflect.Type;
 
@@ -18,10 +18,10 @@ public class WeatherHourForecastDeserializer implements JsonDeserializer<Weather
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         WeatherHourForecast weather = new WeatherHourForecast();
 
-        weather.setCity(jsonDeserializationContext.deserialize(jsonObject.get("city").getAsJsonObject(), City.class));
+        weather.setCity(jsonDeserializationContext.deserialize(jsonObject.get("city").getAsJsonObject(), CityData.class));
 
         for (var pos: jsonObject.get("list").getAsJsonArray()) {
-            weather.getList().add(jsonDeserializationContext.deserialize(pos.getAsJsonObject(), HourForecastListPosition.class));
+            weather.getList().add(jsonDeserializationContext.deserialize(pos.getAsJsonObject(), HourForecastListPositionData.class));
         }
 
         return weather;

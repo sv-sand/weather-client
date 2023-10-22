@@ -8,17 +8,25 @@ import lombok.Data;
  */
 
 @Data
-public class Description {
+public class DescriptionData {
 
     // Weather condition id
     private long id;
 
     // Group of weather parameters (Rain, Snow, Extreme etc.)
-    private String main;
+    private String main = "";
 
     // Weather condition within the group. You can get the output in your language
-    private String description;
+    private String description = "";
 
     //Weather icon id
-    private String icon;
+    private String icon = "";
+
+    /**
+     * Check empty or filled object
+     * @return true - if empty object, false - if object contains any data
+     */
+    public boolean isEmpty() {
+        return id == 0;
+    }
 }

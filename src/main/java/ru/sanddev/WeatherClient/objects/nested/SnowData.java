@@ -9,7 +9,7 @@ import lombok.Data;
  */
 
 @Data
-public class Snow {
+public class SnowData {
     // Snow volume for the last 1 hour, mm
     @SerializedName("1h")
     private double h1;
@@ -17,4 +17,12 @@ public class Snow {
     // Snow volume for the last 3 hour, mm
     @SerializedName("3h")
     private double h3;
+
+    /**
+     * Check empty or filled object
+     * @return true - if empty object, false - if object contains any data
+     */
+    public boolean isEmpty() {
+        return h1 == 0 && h3 == 0;
+    }
 }
