@@ -2,9 +2,10 @@
 
 Here is the library for loading weather data from API of http://openweathermap.org
 
-## Build
-
 You can build this sources as artifact. As a result, a file `weather-client.jar` will be created.
+
+Or you can download last version of library. 
+
 ## How to use
 
 ### Manually include in to the project
@@ -30,7 +31,7 @@ Now you can use library in your any maven project:
 <dependency>
     <groupId>ru.sanddev</groupId>
     <artifactId>weather-client</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 

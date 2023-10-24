@@ -6,7 +6,8 @@
 
     <groupId>ru.sanddev</groupId>
     <artifactId>weather-client</artifactId>
-    <version>1.0.1</version>
+    <packaging>jar</packaging>
+    <version>1.0.2</version>
 
     <dependencies>
         <dependency>
