@@ -8,7 +8,7 @@ import ru.sanddev.WeatherClient.objects.WeatherToday;
  * @since 22.10.2023
  */
 
-public class TemperatureConversionTest extends WeatherClientMockedTest {
+public class TemperatureConversionTest extends WeatherClientTester {
     @Test
     public void tempConversionKelvinToCelsius() {
         final double CELSIUS_TO_KELVIN = 273.15;

@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.sanddev.WeatherClient.objects.WeatherHourForecast;
 import ru.sanddev.WeatherClient.objects.WeatherToday;
 
 import java.util.Locale;
@@ -10,7 +9,7 @@ import java.util.Locale;
  * @since 22.10.2023
  */
 
-public class WeatherTodayTest extends WeatherClientMockedTest{
+public class WeatherTodayTest extends WeatherClientTester {
 
     @Test
     public void today() {

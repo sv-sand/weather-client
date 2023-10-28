@@ -8,7 +8,7 @@ import ru.sanddev.WeatherClient.objects.WeatherToday;
  * @since 22.10.2023
  */
 
-public class PressureConversionTest extends WeatherClientMockedTest {
+public class PressureConversionTest extends WeatherClientTester {
     @Test
     public void pressureConversionPascalToBar() {
         final double BAR_TO_PASCAL = 100000;
