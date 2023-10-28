@@ -1,13 +1,11 @@
 # InteleiJ Idea
 /.idea/
 /target/
+/out/
 
 # Project files
 /logs/
-/out/
 
-# Secrets
-config.properties
 
 
 

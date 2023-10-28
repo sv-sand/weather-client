@@ -9,7 +9,7 @@ import java.util.Locale;
  * @since 22.10.2023
  */
 
-public class WeatherHourForecastTest extends WeatherClientMockedTest {
+public class WeatherHourForecastTest extends WeatherClientTester {
 
     @Test
     public void hourForecast() {

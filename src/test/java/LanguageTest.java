@@ -9,7 +9,7 @@ import java.util.Locale;
  * @since 22.10.2023
  */
 
-public class LanguageTest extends WeatherClientMockedTest {
+public class LanguageTest extends WeatherClientTester {
     @Test
     public void changeLanguage() {
         setLocale(new Locale("en"));

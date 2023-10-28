@@ -10,7 +10,7 @@ import java.util.Locale;
  * @since 22.10.2023
  */
 
-public class NegativeTest extends WeatherClientMockedTest {
+public class NegativeTest extends WeatherClientTester {
 
     private void wrongCityCheck() {
         try {
