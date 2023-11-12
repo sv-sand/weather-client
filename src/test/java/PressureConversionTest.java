@@ -27,7 +27,7 @@ public class PressureConversionTest extends WeatherClientTester {
 
     @Test
     public void pressureConversionPascalToMmHg() {
-        final double MHP_TO_PASCAL = 133.3223684;
+        final double MHP_TO_PASCAL = 1.333223684;
 
         var city = "Moscow";
         client.setCity(city);
@@ -43,7 +43,7 @@ public class PressureConversionTest extends WeatherClientTester {
 
     @Test
     public void pressureConversionBarToMmHg() {
-        final double MmHg_TO_BAR = 133.3223684 / 100000;
+        final double MmHg_TO_BAR = 1.333223684 / 100000;
 
         var city = "Moscow";
         client.setCity(city);

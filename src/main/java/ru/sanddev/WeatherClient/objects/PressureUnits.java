@@ -9,7 +9,7 @@ public enum PressureUnits {
     MmHg,
     BAR;
 
-    private final static double MHP_TO_PASCAL = 133.3223684;
+    private final static double MHP_TO_PASCAL = 1.333223684;
     private final static double BAR_TO_PASCAL = 100000;
     private final static double MmHg_TO_BAR = MHP_TO_PASCAL / BAR_TO_PASCAL;
 
